@@ -211,16 +211,16 @@ public class Player extends Activity implements MediaPlayer.OnPreparedListener,
     public boolean onInfo(MediaPlayer mp, int what, int extra) {
         switch(what) {
 
-            case MediaPlayer. MEDIA_INFO_VIDEO_NOT_PLAYING:
+            case MediaPlayer.MEDIA_INFO_VIDEO_NOT_PLAYING:
+            case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
+            case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
                 videoView.stopPlayback();
                 videoView.setVideoURI(Uri.parse("http://199.192.21.16:8080/live/streaming.m3u8"));
                 break;
-            case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
-                //displayTitle();
-                break;
+
 
         }
-        
+
         return false;
     }
 
