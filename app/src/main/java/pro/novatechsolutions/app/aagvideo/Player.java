@@ -18,8 +18,11 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.VideoView;
 
+import com.devbrackets.android.exomedia.listener.OnCompletionListener;
+import com.devbrackets.android.exomedia.listener.OnErrorListener;
+import com.devbrackets.android.exomedia.listener.OnPreparedListener;
+import com.devbrackets.android.exomedia.listener.OnVideoSizeChangedListener;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
@@ -27,10 +30,10 @@ import org.apache.http.Header;
 import org.json.JSONObject;
 
 import pro.novatechsolutions.aagvideos.R;
+import com.devbrackets.android.exomedia.ui.widget.VideoView;
 
 
-public class Player extends Activity implements MediaPlayer.OnPreparedListener,
-        MediaPlayer.OnCompletionListener, View.OnTouchListener, MediaPlayer.OnErrorListener, MediaPlayer.OnInfoListener {
+public class Player extends Activity implements OnPreparedListener, OnCompletionListener, OnErrorListener, OnVideoSizeChangedListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,9 +65,8 @@ public class Player extends Activity implements MediaPlayer.OnPreparedListener,
         videoView = findViewById(R.id.video_view);
         videoView.setOnPreparedListener(this);
         videoView.setOnCompletionListener(this);
-        videoView.setOnTouchListener(this);
         videoView.setOnErrorListener(this);
-        videoView.setOnInfoListener(this);
+        videoView.setOnVideoSizedChangedListener(this);
 
         videoView.setVideoURI(Uri.parse("http://199.192.21.16:8080/live/streaming.m3u8"));
         hideSystemUi();
@@ -111,15 +113,6 @@ public class Player extends Activity implements MediaPlayer.OnPreparedListener,
         super.onDestroy();
         videoView.stopPlayback();
         videoView.setVideoURI(null);
-    }
-
-
-
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        videoView.start();
-        return false;
     }
 
 
@@ -193,48 +186,31 @@ public class Player extends Activity implements MediaPlayer.OnPreparedListener,
     private SharedPreferences.Editor editor;
     private int mVideoWidth,mVideoHeight;
 
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        //displayTitle();
-        videoView.stopPlayback();
-        videoView.setVideoURI(Uri.parse("http://199.192.21.16:8080/live/streaming.m3u8"));
-    }
+
+
+
 
     @Override
-    public boolean onError(MediaPlayer mp, int what, int extra) {
-        videoView.stopPlayback();
-        videoView.setVideoURI(Uri.parse("http://199.192.21.16:8080/live/streaming.m3u8"));
-        return false;
-    }
-
-    @Override
-    public boolean onInfo(MediaPlayer mp, int what, int extra) {
-        switch(what) {
-
-            case MediaPlayer.MEDIA_INFO_VIDEO_NOT_PLAYING:
-            case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
-            case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
-                videoView.stopPlayback();
-                videoView.setVideoURI(Uri.parse("http://199.192.21.16:8080/live/streaming.m3u8"));
-                break;
-
-
-        }
-
-        return false;
-    }
-
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-
+    public void onPrepared() {
         videoView.start();
-        mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-            @Override
-            public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                displayTitle();
-            }
-        });
         logo.setVisibility(View.VISIBLE);
         aagscreen.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onCompletion() {
+
+    }
+
+    @Override
+    public boolean onError(Exception e) {
+        videoView.stopPlayback();
+        videoView.setVideoURI(Uri.parse("http://199.192.21.16:8080/live/streaming.m3u8"));
+        return false;
+    }
+
+    @Override
+    public void onVideoSizeChanged(int intrinsicWidth, int intrinsicHeight, float pixelWidthHeightRatio) {
+        displayTitle();
     }
 }
