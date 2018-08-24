@@ -65,7 +65,7 @@ public class Player extends Activity implements MediaPlayer.OnPreparedListener,
         videoView.setOnTouchListener(this);
         videoView.setOnErrorListener(this);
         videoView.setOnInfoListener(this);
-     
+
         videoView.setVideoURI(Uri.parse("http://199.192.21.16:8080/live/streaming.m3u8"));
         hideSystemUi();
 
@@ -220,21 +220,20 @@ public class Player extends Activity implements MediaPlayer.OnPreparedListener,
                 break;
 
         }
-        if(videoView.isPlaying()) {
-            mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-                @Override
-                public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                    displayTitle();
-                }
-            });
-
-        }
+        
         return false;
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
+
         videoView.start();
+        mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+            @Override
+            public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                displayTitle();
+            }
+        });
         logo.setVisibility(View.VISIBLE);
         aagscreen.setVisibility(View.GONE);
     }
